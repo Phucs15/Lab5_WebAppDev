@@ -145,12 +145,103 @@
             font-size: 64px;
             margin-bottom: 20px;
         }
+
+        .search-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .search-input {
+            flex: 1; /* Takes up remaining space */
+            padding: 12px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-reset {
+            background-color: #e2e6ea;
+            color: #495057;
+            border: 1px solid #ced4da;
+        }
+
+        .btn-reset:hover {
+            background-color: #dbe2e8;
+            text-decoration: none;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 5px;
+        }
+
+        .pagination a, .pagination span {
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            color: #667eea;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .pagination a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .pagination .active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination .disabled {
+            color: #ccc;
+            pointer-events: none;
+            border-color: #eee;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>📚 Student Management System</h1>
     <p class="subtitle">MVC Pattern with Jakarta EE & JSTL</p>
+
+    <div class="search-container">
+        <form action="student" method="get" style="display: flex; width: 100%; gap: 10px;">
+            <input type="hidden" name="action" value="search">
+
+            <input type="text"
+                   class="search-input"
+                   name="keyword"
+                   value="${keyword}"
+                   placeholder="Search by Name, ID, or Email...">
+
+            <button type="submit" class="btn btn-primary">
+                🔍 Search
+            </button>
+
+            <c:if test="${not empty keyword}">
+                <a href="student?action=list" class="btn btn-reset">
+                    ✕ Reset
+                </a>
+            </c:if>
+        </form>
+    </div>
 
     <!-- Success Message -->
     <c:if test="${not empty param.message}">
@@ -173,16 +264,66 @@
         </a>
     </div>
 
+    <%-- Filter Dropdown --%>
+    <div style="margin: 20px 0; background: #f1f3f5; padding: 15px; border-radius: 5px;">
+        <form action="student" method="get" style="display: flex; align-items: center; gap: 10px;">
+            <input type="hidden" name="action" value="filter">
+            <label style="font-weight: bold;">Filter by Major:</label>
+
+            <select name="major" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                <option value="">-- All Majors --</option>
+
+                <option value="Software Engineering" ${selectedMajor == 'Software Engineering' ? 'selected' : ''}>
+                    Software Engineering
+                </option>
+
+                <option value="Information Technology" ${selectedMajor == 'Information Technology' ? 'selected' : ''}>
+                    Information Technology
+                </option>
+
+                <option value="Computer Science" ${selectedMajor == 'Computer Science' ? 'selected' : ''}>
+                    Computer Science
+                </option>
+
+                <option value="Business Administration" ${selectedMajor == 'Business Administration' ? 'selected' : ''}>
+                    Business Administration
+                </option>
+            </select>
+
+            <button type="submit" class="btn btn-secondary" style="padding: 8px 15px;">Apply Filter</button>
+
+            <c:if test="${not empty selectedMajor}">
+                <a href="student?action=list" style="margin-left: 10px; color: #dc3545; text-decoration: none;">Clear Filter</a>
+            </c:if>
+        </form>
+    </div>
+
     <!-- Student Table -->
     <c:choose>
         <c:when test="${not empty students}">
             <table>
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Student Code</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
+                    <th>
+                        <a href="student?action=sort&sortBy=id&order=${order == 'ASC' ? 'DESC' : 'ASC'}" style="color: white; text-decoration: none;">
+                            ID ${sortBy == 'id' ? (order == 'ASC' ? '▲' : '▼') : ''}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="student?action=sort&sortBy=student_code&order=${order == 'ASC' ? 'DESC' : 'ASC'}" style="color: white; text-decoration: none;">
+                            Code ${sortBy == 'student_code' ? (order == 'ASC' ? '▲' : '▼') : ''}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="student?action=sort&sortBy=full_name&order=${order == 'ASC' ? 'DESC' : 'ASC'}" style="color: white; text-decoration: none;">
+                            Full Name ${sortBy == 'full_name' ? (order == 'ASC' ? '▲' : '▼') : ''}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="student?action=sort&sortBy=email&order=${order == 'ASC' ? 'DESC' : 'ASC'}" style="color: white; text-decoration: none;">
+                            Email ${sortBy == 'email' ? (order == 'ASC' ? '▲' : '▼') : ''}
+                        </a>
+                    </th>
                     <th>Major</th>
                     <th>Actions</th>
                 </tr>
@@ -220,6 +361,27 @@
             </div>
         </c:otherwise>
     </c:choose>
+
+    <div class="pagination">
+        <c:if test="${currentPage > 1}">
+            <a href="student?action=list&page=${currentPage - 1}">« Previous</a>
+        </c:if>
+
+        <c:forEach begin="1" end="${noOfPages}" var="i">
+            <c:choose>
+                <c:when test="${currentPage == i}">
+                    <span class="active">${i}</span>
+                </c:when>
+                <c:otherwise>
+                    <a href="student?action=list&page=${i}">${i}</a>
+                </c:otherwise>
+            </c:choose>
+        </c:forEach>
+
+        <c:if test="${currentPage < noOfPages}">
+            <a href="student?action=list&page=${currentPage + 1}">Next »</a>
+        </c:if>
+    </div>
 </div>
 </body>
 </html>

@@ -121,6 +121,13 @@
             color: #666;
             margin-top: 5px;
         }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 5px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -148,42 +155,32 @@
 
         <!-- Student Code -->
         <div class="form-group">
-            <label for="studentCode">
-                Student Code <span class="required">*</span>
-            </label>
-            <input type="text"
-                   id="studentCode"
-                   name="studentCode"
-                   value="${student.studentCode}"
-            ${student != null ? 'readonly' : 'required'}
-                   placeholder="e.g., SV001, IT123">
-            <p class="info-text">Format: 2 letters + 3+ digits</p>
+            <label>Student Code:</label>
+            <input type="text" name="studentCode" value="${student.studentCode}" class="form-control">
+
+            <c:if test="${not empty errorCode}">
+                <span class="text-danger">${errorCode}</span>
+            </c:if>
         </div>
 
         <!-- Full Name -->
         <div class="form-group">
-            <label for="fullName">
-                Full Name <span class="required">*</span>
-            </label>
-            <input type="text"
-                   id="fullName"
-                   name="fullName"
-                   value="${student.fullName}"
-                   required
-                   placeholder="Enter full name">
+            <label>Full Name:</label>
+            <input type="text" name="fullName" value="${student.fullName}" class="form-control">
+
+            <c:if test="${not empty errorName}">
+                <span class="text-danger">${errorName}</span>
+            </c:if>
         </div>
 
         <!-- Email -->
         <div class="form-group">
-            <label for="email">
-                Email <span class="required">*</span>
-            </label>
-            <input type="email"
-                   id="email"
-                   name="email"
-                   value="${student.email}"
-                   required
-                   placeholder="student@example.com">
+            <label>Email:</label>
+            <input type="email" name="email" value="${student.email}" class="form-control">
+
+            <c:if test="${not empty errorEmail}">
+                <span class="text-danger">${errorEmail}</span>
+            </c:if>
         </div>
 
         <!-- Major -->
